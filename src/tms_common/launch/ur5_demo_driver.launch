@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="robot_ip" default="192.168.1.101"/>
+  <arg name="controllers" default="joint_state_controller
+                                   speed_scaling_state_controller
+                                   joint_group_vel_controller
+                                   "/>
+  <arg name="stopped_controllers" default="scaled_pos_joint_traj_controller"/>
+  <include file="$(find tms_ur_description)/launch/load_ur5.launch"/>
+
+  <include file="$(find tms_common)/launch/included/ur_common.launch" pass_all_args="true">
+    <arg name="controller_config_file" value="$(find tms_common)/config/ur_driver/ur5_controllers.yaml"/>
+    <arg name="kinematics_config" value="$(find tms_ur_description)/config/ur5/default_kinematics.yaml"/>
+  </include>
+
+
+</launch>

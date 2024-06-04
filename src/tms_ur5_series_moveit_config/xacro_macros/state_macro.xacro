@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+<xacro:macro name="pose" params="name group:=manipulator q1 q2 q3 q4 q5 q6">
+  <group_state name="${name}" group="${group}">
+      <joint name="shoulder_pan_joint" value="${q1*(pi/180)}" />
+      <joint name="shoulder_lift_joint" value="${q2*(pi/180)}" />
+      <joint name="elbow_joint" value="${q3*(pi/180)}" />
+      <joint name="wrist_1_joint" value="${q4*(pi/180)}" />
+      <joint name="wrist_2_joint" value="${q5*(pi/180)}" />
+      <joint name="wrist_3_joint" value="${q6*(pi/180)}" />
+  </group_state>
+</xacro:macro>
+</robot>

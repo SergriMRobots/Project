@@ -1,0 +1,4 @@
+<launch>
+  <rosparam file="$(find tms_ur5_series_moveit_config)/config/ur5_config/trajectory_ros_controllers.yaml"/>
+  <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager"/>
+</launch>

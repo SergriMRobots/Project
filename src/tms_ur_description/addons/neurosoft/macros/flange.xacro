@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+
+<xacro:macro name="add_flange" params="attach_link rot_angle_deg:=0">
+    <joint name="flange_joint" type="fixed">
+      <parent link="${attach_link}" />
+      <child link = "flange_link" />
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${radians(rot_angle_deg)}" />
+    </joint>
+    <link name="flange_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/neurosoft/meshes/crane/visual/flange.dae"/>
+        </geometry>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/neurosoft/meshes/crane/collision/flange.stl"/>
+        </geometry>
+      </collision>
+    </link>
+</xacro:macro>
+
+
+</robot>

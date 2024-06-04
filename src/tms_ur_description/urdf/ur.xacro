@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur">
+
+
+   <!-- import main macro -->
+   <xacro:include filename="$(find tms_ur_description)/urdf/inc/ur_macro.xacro"/>
+   <xacro:include filename="$(find tms_ur_description)/addons/neurosoft/macros/flange.xacro"/>
+   <xacro:include filename="$(find tms_ur_description)/addons/neurosoft/macros/coil_macro.xacro"/>
+   <xacro:include filename="$(find tms_ur_description)/addons/neurosoft/macros/ndi_marker_macro.xacro"/>
+   <xacro:include filename="$(find tms_ur_description)/addons/kunwei/force_torque_sensor.xacro"/>
+
+   <!-- parameters -->
+   <xacro:arg name="joint_limit_params" default=""/>
+   <xacro:arg name="kinematics_params" default=""/>
+   <xacro:arg name="physical_params" default=""/>
+   <xacro:arg name="visual_params" default=""/>
+   <xacro:arg name="base_rot_angle" default="180"/>
+
+
+   <!-- legal values:
+         - hardware_interface/PositionJointInterface
+         - hardware_interface/VelocityJointInterface
+         - hardware_interface/EffortJointInterface
+   -->
+   <xacro:arg name="transmission_hw_interface" default="hardware_interface/PositionJointInterface"/>
+   <xacro:arg name="safety_limits" default="false"/>
+   <xacro:arg name="safety_pos_margin" default="0.15"/>
+   <xacro:arg name="safety_k_position" default="20"/>
+
+   <xacro:property name="connection_file"
+                   value="$(find tms_ur_description)/config/ur5/ur_connection_param.yaml"/>
+   <xacro:property name="robot_connection_parameters"
+                   value="${xacro.load_yaml(connection_file)}"/>
+   <xacro:property name="floor_to_base_height" value="${robot_connection_parameters['floor_base_height_mm']}"/>
+
+   <link name="world" />
+
+   <joint name="world_joint" type="fixed">
+     <parent link="world" />
+     <child link = "tms_base" />
+     <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+   </joint>
+   <link name="tms_base">
+      <visual>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
+       <geometry>
+         <mesh filename="package://tms_ur_description/meshes/base/visual/base.dae"/>
+       </geometry>
+       </visual>
+       <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/meshes/base/collision/base.stl"/>
+        </geometry>
+        </collision>
+    </link>
+    <gazebo reference="tms_base">
+        <self_collide>1</self_collide>
+        <kinematic>1</kinematic> <!-- Делает базу робота неподвижной -->
+    </gazebo>
+   <joint name="tms_base_joint" type="fixed">
+     <parent link="tms_base" />
+     <child link = "base_link" />
+     <origin xyz="0.0 0.0 ${floor_to_base_height/1000}" rpy="0.0 0.0 ${radians($(arg base_rot_angle))}" />
+   </joint>
+   <!-- arm -->
+   <xacro:ur_robot
+     prefix=""
+     joint_limits_parameters_file="$(arg joint_limit_params)"
+     kinematics_parameters_file="$(arg kinematics_params)"
+     physical_parameters_file="$(arg physical_params)"
+     visual_parameters_file="$(arg visual_params)"
+     transmission_hw_interface="$(arg transmission_hw_interface)"
+     safety_limits="$(arg safety_limits)"
+     safety_pos_margin="$(arg safety_pos_margin)"
+     safety_k_position="$(arg safety_k_position)"/>
+
+   <xacro:add_sensor
+     attach_link="wrist_3_link"
+     rot_angle_deg="180"/>
+
+
+   <xacro:add_flange
+     attach_link="sensor_connector"
+     rot_angle_deg="0"/>
+   <xacro:add_coil
+     attach_link="flange_link"
+     coil_params_file="$(find tms_ur_description)/addons/neurosoft/coil_parameters.yaml"/>
+   <xacro:add_ndi_marker
+     coil_params_file="$(find tms_ur_description)/addons/neurosoft/coil_parameters.yaml"/>
+
+</robot>

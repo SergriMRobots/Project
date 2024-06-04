@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="use_vanilla"
+        doc="Use build moveit_servo_vanilla_1.1.14 if true
+        or moveit_servo in otherwise "/>
+    <group if="$(arg use_vanilla)">
+        <rosparam command="load" file="$(find tms_common)/config/moveit_servo/ur_config_vanilla.yaml" ns="servo_server"/>
+    </group>
+    <group unless="$(arg use_vanilla)">
+        <rosparam command="load" file="$(find tms_common)/config/moveit_servo/ur_config.yaml" ns="servo_server"/>
+    </group>
+    <!-- This node does the servoing calculations -->
+    <node name="servo_server" pkg="moveit_servo" type="servo_server" output="screen" >
+
+    </node>
+</launch>

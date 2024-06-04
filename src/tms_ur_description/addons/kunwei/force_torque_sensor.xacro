@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+
+
+<xacro:macro name="construct_cylinder" params="diameter height offset:=0">
+    <origin xyz="0 0 ${height/2+offset}" rpy="0 0 0"/>
+    <geometry>
+      <cylinder radius="${diameter/2}" length="${height}"/>
+    </geometry>
+</xacro:macro>
+
+<xacro:macro name="add_sensor" params="attach_link rot_angle_deg:=0">
+    <joint name="${attach_link}-sensor_body_joint" type="fixed">
+      <parent link="${attach_link}" />
+      <child link = "sensor_body" />
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${radians(rot_angle_deg)}" />
+    </joint>
+<!--    <gazebo reference="${attach_link}-sensor_body_joint">-->
+<!--      <preserveFixedJoint>true</preserveFixedJoint>-->
+<!--    </gazebo>-->
+    <xacro:property name="sensor_flange_mm" value="10"/>
+    <xacro:property name="sensor_main_body_mm" value="${39.5-sensor_flange_mm}"/>
+    <xacro:property name="attachment_offset_mm" value="${47.5-sensor_main_body_mm-sensor_flange_mm}"/>
+    <link name="sensor_body">
+<!--        <inertial>-->
+<!--          <mass value='0.25' />-->
+<!--          <inertia ixx='0.01' ixy='0' ixz='0' iyy='0.01' iyz='0' izz='0.01' />-->
+<!--        </inertial>-->
+        <visual>
+            <xacro:construct_cylinder
+            diameter="${75/1000}"
+            height="${sensor_flange_mm/1000}"
+            />
+            <material name="black">
+                <color rgba="0.0 0.0 0.0 1"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:construct_cylinder
+            diameter="${75/1000}"
+            height="${sensor_main_body_mm/1000}"
+            offset="${sensor_flange_mm/1000}"
+            />
+            <material name="light_grey">
+                <color rgba="0.75 0.75 0.75 1"/>
+            </material>
+        </visual>
+        <visual>
+            <xacro:construct_cylinder
+            diameter="${63/1000}"
+            height="${attachment_offset_mm/1000}"
+            offset="${(sensor_main_body_mm+sensor_flange_mm)/1000}"
+            />
+            <material name="light_grey">
+                <color rgba="0.75 0.75 0.75 1"/>
+            </material>
+        </visual>
+        <collision>
+            <xacro:construct_cylinder
+            diameter="${75/1000}"
+            height="${(sensor_flange_mm+sensor_main_body_mm)/1000}"
+            />
+        </collision>
+    </link>
+
+    <joint name="sensor_body-sensor_connector_joint" type="fixed">
+      <parent link="sensor_body" />
+      <child link = "sensor_connector" />
+      <origin xyz="0.0 0.0 ${(sensor_main_body_mm+sensor_flange_mm+attachment_offset_mm)/1000}" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="sensor_connector"/>
+    <joint name="sensor_body-sensor_measurment_frame_joint" type="fixed">
+      <parent link="sensor_body" />
+      <child link = "ft_frame" />
+      <origin xyz="0.0 0.0 ${(sensor_main_body_mm+sensor_flange_mm+attachment_offset_mm)/1000}" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="ft_frame"/>
+
+</xacro:macro>
+
+</robot>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="use_sim"
+        doc="Use spacenav_node for real 3dconnexion device if true or
+        spacenav_sim otherwise"/>
+    <node name="spacenav_node" pkg="spacenav_node" type="spacenav_node" unless="$(arg use_sim)"/>
+    <node name="spacenav_node" pkg="spacenav_sim" type="spacenav_sim_node" if="$(arg use_sim)"/>
+
+    <arg name="teleop_config" default="$(find tms_common)/config/moveit_servo/spacenav_via_teleop_tools.yaml" />
+    <rosparam file="$(arg teleop_config)" command="load" />
+
+    <node pkg="joy_teleop" type="joy_teleop.py" name="joy_teleop">
+      <remap from="/joy" to="/spacenav/joy" />
+    </node>
+
+</launch>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+
+<xacro:macro name="add_ndi_marker" params="coil_params_file">
+    <xacro:property name="ndi_params" value="${xacro.load_yaml(coil_params_file)}"/>
+
+    <!--  Coil placement relative flange Parameters-->
+    <xacro:property name="attach_point" value="${ndi_params['ndi_marker']['attach_point']}"/>
+    <xacro:property name="parent_frame" value="${ndi_params['ndi_marker']['parent_frame']}"/>
+    <xacro:property name="ndi_marker_model" value="${ndi_params['ndi_marker']['marker_model']}"/>
+
+    <xacro:property name="x" value="${attach_point['x_mm']/1000.0}" />
+    <xacro:property name="y" value="${attach_point['y_mm']/1000.0}" />
+    <xacro:property name="z" value="${attach_point['z_mm']/1000.0}" />
+    <xacro:property name="roll" value="${attach_point['roll_deg']*(pi/180)}" />
+    <xacro:property name="pitch" value="${attach_point['pitch_deg']*(pi/180)}"/>
+    <xacro:property name="yaw" value="${attach_point['yaw_deg']*(pi/180)}" />
+
+    <joint name="ndi_marker_joint" type="fixed">
+      <parent link="${parent_frame}" />
+      <child link = "ndi_marker_link" />
+      <origin xyz="${x} ${y} ${z}" rpy="${roll} ${pitch} ${yaw}" />
+    </joint>
+    <link name="ndi_marker_link">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/neurosoft/meshes/ndi_marker/visual/ndi_marker_${ndi_marker_model}.stl"/>
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/neurosoft/meshes/ndi_marker/collision/ndi_marker_${ndi_marker_model}.stl"/>
+        </geometry>
+        <material name="LightGrey">
+          <color rgba="0.7 0.7 0.7 1.0"/>
+        </material>
+      </collision>
+    </link>
+</xacro:macro>
+
+</robot>

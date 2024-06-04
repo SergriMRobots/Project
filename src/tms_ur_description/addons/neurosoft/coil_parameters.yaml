@@ -1,0 +1,50 @@
+coil_link:
+  visual:
+    mesh: "package://tms_ur_description/addons/neurosoft/meshes/coil/visual/coil.dae"
+  collision:
+    mesh: "package://tms_ur_description/addons/neurosoft/meshes/coil/collision/coil.stl"
+  dynamic_params:
+    mass: 1.4
+    x_cm: 0.0
+    y_cm: 0.19
+    z_cm: -0.02
+    i_xx: 0.08 #kg*m^2(from solidworks model)
+    i_xy: 0.0 #kg*m^2(from solidworks model)
+    i_yy: 0.0 #kg*m^2(from solidworks model)
+    i_xz: 0.0 #kg*m^2(from solidworks model)
+    i_yz: -0.01 #kg*m^2(from solidworks model)
+    i_zz: 0.08 #kg*m^2(from solidworks model)
+  attach_point: # Параметры расположения системы координат коила в системе координат фланца
+    x_mm: 0.0
+    y_mm: -250
+    z_mm: 74.94
+    roll_deg: 0
+    pitch_deg: 180
+    yaw_deg: 0
+  ee_link: # Параметры расположения системы координат рабочей точки в системе координат коила
+    x_mm: 0.0
+    y_mm: 250.46
+    z_mm: -22.34 #Как было то -50.39 как на модели коила в пульте, то -22.34
+    roll_deg: 180.0
+    pitch_deg: 0
+    yaw_deg: 180.0
+  marker_link: # Параметры расположения системы координат маркера визуальной системы координат
+    parent_frame: ndi_marker_link #Имя системы координат относительно которой мы задаем координаты маркера
+    x_mm: -40.46
+    y_mm: 0.0
+    z_mm: 15.1
+    #NOTE: Теперь вроде збс
+    roll_deg: 180.0
+    pitch_deg: -90
+    yaw_deg: 0.0
+#Параметры меша для NDI маркера
+ndi_marker:
+    marker_model: "8700339"
+    parent_frame: flange_link
+    attach_point: #Расположение системы координат ndi маркера в
+        x_mm: 0.0
+        y_mm: 44.7
+        z_mm: 5.0
+        roll_deg: -90
+        pitch_deg: 90
+        yaw_deg: 0

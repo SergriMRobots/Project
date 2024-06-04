@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+<xacro:macro name="read_coil_data" params="coil_params_file">
+  <xacro:property name="coil_params" value="${xacro.load_yaml(coil_params_file)}"/>
+  <xacro:property name="visual_mesh" value="${coil_params['coil_link']['visual']['mesh']}" scope="parent"/>
+  <xacro:property name="collision_mesh" value="${coil_params['coil_link']['collision']['mesh']}" scope="parent"/>
+
+  <!--  Coil placement relative flange Parameters-->
+  <xacro:property name="attach_point" value="${coil_params['coil_link']['attach_point']}"/>
+  <xacro:property name="x" value="${attach_point['x_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="y" value="${attach_point['y_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="z" value="${attach_point['z_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="roll" value="${attach_point['roll_deg']*(pi/180)}" scope="parent"/>
+  <xacro:property name="pitch" value="${attach_point['pitch_deg']*(pi/180)}" scope="parent"/>
+  <xacro:property name="yaw" value="${attach_point['yaw_deg']*(pi/180)}" scope="parent"/>
+
+  <!--  End effector placement relative coil origin-->
+  <xacro:property name="ee_link" value="${coil_params['coil_link']['ee_link']}"/>
+  <xacro:property name="x_ee" value="${ee_link['x_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="y_ee" value="${ee_link['y_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="z_ee" value="${ee_link['z_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="roll_ee" value="${ee_link['roll_deg']*(pi/180)}" scope="parent"/>
+  <xacro:property name="pitch_ee" value="${ee_link['pitch_deg']*(pi/180)}" scope="parent"/>
+  <xacro:property name="yaw_ee" value="${ee_link['yaw_deg']*(pi/180)}" scope="parent"/>
+
+  <!--  Marker frame placement relative -->
+  <xacro:property name="marker_link" value="${coil_params['coil_link']['marker_link']}"/>
+  <xacro:property name="marker_parent_frame" value="${marker_link['parent_frame']}" scope="parent"/>
+  <xacro:property name="x_marker_link" value="${marker_link['x_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="y_marker_link" value="${marker_link['y_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="z_marker_link" value="${marker_link['z_mm']/1000.0}" scope="parent"/>
+  <xacro:property name="roll_marker_link" value="${marker_link['roll_deg']*(pi/180)}" scope="parent"/>
+  <xacro:property name="pitch_marker_link" value="${marker_link['pitch_deg']*(pi/180)}" scope="parent"/>
+  <xacro:property name="yaw_marker_link" value="${marker_link['yaw_deg']*(pi/180)}" scope="parent"/>
+
+  <xacro:property name="dynamic_params" value="${coil_params['coil_link']['dynamic_params']}"/>
+  <xacro:property name="mass" value="${dynamic_params['mass']}" scope="parent"/>
+  <xacro:property name="x_cm" value="${dynamic_params['x_cm']}" scope="parent"/>
+  <xacro:property name="y_cm" value="${dynamic_params['y_cm']}" scope="parent"/>
+  <xacro:property name="z_cm" value="${dynamic_params['z_cm']}" scope="parent"/>
+
+  <xacro:property name="i_xx" value="${dynamic_params['i_xx']}" scope="parent"/>
+  <xacro:property name="i_xy" value="${dynamic_params['i_xy']}" scope="parent"/>
+  <xacro:property name="i_yy" value="${dynamic_params['i_yy']}" scope="parent"/>
+  <xacro:property name="i_xz" value="${dynamic_params['i_xz']}" scope="parent"/>
+  <xacro:property name="i_yz" value="${dynamic_params['i_yz']}" scope="parent"/>
+  <xacro:property name="i_zz" value="${dynamic_params['i_zz']}" scope="parent"/>
+</xacro:macro>
+
+<xacro:macro name="add_coil" params="attach_link coil_params_file" >
+  <xacro:read_coil_data coil_params_file="${coil_params_file}"/>
+  <gazebo reference="coil_link">
+    <selfCollide>true</selfCollide>
+  </gazebo>
+  <link name="coil_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${visual_mesh}"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="${collision_mesh}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${mass}" />
+      <origin xyz="${x_cm} ${y_cm} ${z_cm}"
+              rpy="0 0 0"/>
+      <inertia ixx="${i_xx}" ixy="${i_xy}" ixz="${i_xz}"
+               iyy="${i_yy}" iyz="${i_yz}" izz="${i_zz}"/>
+    </inertial>
+  </link>
+  <joint name="${attach_link}-coil" type="fixed">
+    <origin xyz="${x} ${y} ${z}"
+            rpy="${roll} ${pitch} ${yaw}"/>
+    <parent link="${attach_link}"/>
+    <child link="coil_link"/>
+  </joint>
+  <link name="ee_link"/>
+  <joint name="coil-ee_link" type="fixed">
+    <origin xyz="${x_ee} ${y_ee} ${z_ee}"
+            rpy="${roll_ee} ${pitch_ee} ${yaw_ee}"/>
+    <parent link="coil_link"/>
+    <child link="ee_link"/>
+  </joint>
+  <link name="marker_link"/>
+  <joint name="${marker_parent_frame}-marker_link" type="fixed">
+    <origin xyz="${x_marker_link} ${y_marker_link} ${z_marker_link}"
+            rpy="${roll_marker_link} ${pitch_marker_link} ${yaw_marker_link}"/>
+    <parent link="${marker_parent_frame}"/>
+    <child link="marker_link"/>
+  </joint>
+</xacro:macro>
+
+</robot>
