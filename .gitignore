@@ -1,0 +1,15 @@
+/build*
+/devel*
+/log*
+/install*
+/.catkin_tools
+*.workspace*
+*.workspace
+/.catkin_workspace
+/.catkin_tools
+
+cmake-build-*
+.idea
+.qtc_clangd
+/.vscode
+/.obsidian
