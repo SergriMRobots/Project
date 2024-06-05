@@ -60,6 +60,18 @@ literature overview
      
      ***Плюсы:*** Статья 1992-го года, а значит наши вычислительные мощности много больше. Утверждается, что не требует предопределенной траектории
      
-     ***Минусы:*** 
+     ***Минусы:***  Я пока не понял, как работать с этой структурой данных
+
+   5. [On-line collision avoidance for collaborative robot manipulators by adjusting off-line generated paths: An industrial use case](https://hal.science/hal-02362167/file/LISPEN_RAS_2019_BEAREE.pdf)
+
+      ***Что делают:** on-line collision avoidance into a real industrial application implementing typical sensors and a commonly used collaborative industrial manipulator.
+      
+      ***Подход:*** Немного модифицированный метод виртуальных сил (repulsion/attrraction)
+      
+      ***Что используют:***
+      
+      ***Плюсы:*** Можно работать с движущимися препятствиями, прост в использовании
+      
+      ***Минусы:*** не заглядывает в будущее
 
    
