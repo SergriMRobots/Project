@@ -83,4 +83,17 @@ literature overview
       
       ***Плюсы:***
       
-      ***Минусы:*** 
+      ***Минусы:***
+
+7. [Real-time (self)-collision avoidance task on a HRP-2 humanoid robot](https://hal-lirmm.ccsd.cnrs.fr/lirmm-00798791/file/2008_icra_stasse-real_time_self_collision_avoidance.pdf)
+   
+   ***Что делают:**  
+   
+   ***Подход:*** Утверждают, что для устойчивого управления coll.avoidance. необходима выпуклая оболочка virtual volumes на роботе, которая обеспечит непрерывность градиенита расстояния между точками. Выводят руккурентные уравнения для joints velocity, и затем они ссылаются на [Khatib 1986](https://journals.sagepub.com/doi/10.1177/027836498600500106) (раздел joint limit avoidance)  и пишут закон упрправления, основанный на градиенте cost function
+   
+   ***Что используют:*** Gradient Projection Method (один из методов решения оптимизациионной задачи)
+   
+   ***Плюсы:*** пока не ясны, но результаты показывают, что self coolision avoidance работает
+   
+   ***Минусы:***  
+   
