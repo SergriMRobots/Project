@@ -73,7 +73,7 @@ literature overview
       
       ***Минусы:*** не заглядывает в будущее
 
-   6. [Model predictive control of a collaborative manipulator considering dynamic obstacles (https://onlinelibrary.wiley.com/doi/full/10.1002/oca.2599)
+   6. [Model predictive control of a collaborative manipulator considering dynamic obstacles](https://onlinelibrary.wiley.com/doi/full/10.1002/oca.2599)
 
       ***Что делают:** используют MPC для избежания столкновений статических и динамических препятствий
       
