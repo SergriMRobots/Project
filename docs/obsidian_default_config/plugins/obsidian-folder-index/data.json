@@ -1,0 +1,20 @@
+{
+  "disableHeadlines": false,
+  "graphOverwrite": false,
+  "rootIndexFile": "",
+  "autoCreateIndexFile": true,
+  "autoRenameIndexFile": true,
+  "includeFileContent": false,
+  "hideIndexFiles": false,
+  "indexFileInitText": "```folder-index-content\n```",
+  "autoPreviewMode": true,
+  "sortIndexFilesAlphabetically": true,
+  "sortHeadersAlphabetically": false,
+  "recursiveIndexFiles": true,
+  "renderFolderBold": true,
+  "renderFolderItalic": false,
+  "useBulletPoints": true,
+  "excludeFolders": [
+    "assets"
+  ]
+}
