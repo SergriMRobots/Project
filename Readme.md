@@ -1,14 +1,5 @@
 **Task 1** 
 
-
-   ***Что делают:** 
-   
-   ***Подход:***
-   
-   ***Что используют:*** 
-   ***Плюсы:*** 
-   ***Минусы:*** 
-
 literature overview
 
 1. [A Real-Time Reconfigurable Collision Avoidance System for Robot Manipulation](https://doi.org/10.1145/3068796.3068800)
@@ -103,8 +94,20 @@ literature overview
    
    ***Подход:*** Artificial potential field
    
-   ***Что используют:*** В этой статье интересным сестом является секция "DISTANCE COMPUTATION" 
-   ***Плюсы:*** 
-   ***Минусы:*** 
-
+   ***Что используют:*** В этой статье интересным сестом является секция "DISTANCE COMPUTATION". **Gilbert–Johnson–Keerthi distance algorithm** важен
    
+   ***Плюсы:*** 
+
+   ***Минусы:***
+
+9. [Dynamic collision estimator for collaborative robots: A dynamic Bayesian network with Markov model for highly reliable collision detection](https://www.sciencedirect.com/science/article/pii/S0736584523001679)
+
+   ***Что делают:** детектируют столкновения
+   
+10. Neural networks (simple)
+    https://www.mdpi.com/1424-8220/21/12/4235
+    https://jeas.springeropen.com/counter/pdf/10.1186/s44147-023-00214-8.pdf
+    
+
+
+  
