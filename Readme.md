@@ -43,7 +43,7 @@ literature overview
 \triangle t \cdot (\vec{n} J)\dot{q} < Dist
 ```
    
-   ***Что используют:***
+   ***Что используют:*** NAOqi Framework
    
    ***Плюсы:*** простота
    
@@ -73,4 +73,4 @@ literature overview
       
       ***Минусы:*** не заглядывает в будущее
 
-   
+   6. 
