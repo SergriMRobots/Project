@@ -41,7 +41,7 @@ literature overview
    ***Подход:*** Самый-самый простой способ предсказания наличия коллизий в будущем
 
    ```math
-   \triangle t \cdot
+   \triangle t \cdot (\vec{n} J)\cdot{q} < Dist
    ```
    
    ***Что используют:*** 
