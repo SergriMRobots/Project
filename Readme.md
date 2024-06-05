@@ -1,5 +1,14 @@
 **Task 1** 
 
+
+   ***Что делают:** 
+   
+   ***Подход:***
+   
+   ***Что используют:*** 
+   ***Плюсы:*** 
+   ***Минусы:*** 
+
 literature overview
 
 1. [A Real-Time Reconfigurable Collision Avoidance System for Robot Manipulation](https://doi.org/10.1145/3068796.3068800)
@@ -10,4 +19,17 @@ literature overview
    ***Что используют:*** [FCL library](https://github.com/flexible-collision-library/fcl) для Distance computation и Collision detection
 
    ***Плюсы:*** надежность, простота
+   
    ***Минусы:*** Слишком *дорого* считать. Если у нас неизвестна траектория (teleoperation mode), то рассчеты придется делать часто.
+
+2. [Model-predictive Collision Avoidance in Teleoperation of Mobile Robots](https://macsphere.mcmaster.ca/bitstream/11375/13318/1/fulltext.pdf)
+
+   ***Что делают:** Создают фреймворк для комбинирования телеопераций с автономным помощником, основанном на MPC. 
+   
+   ***Подход:*** С помощью данных с робота и линейной экстраполяции команд оператора заглядывают в будущее и производят корректировки траектории, параллельно с этим, ограничивая свободу оператора через feedback систему (мешая оператору)  
+   
+   ***Что используют:*** MPC
+   
+   ***Плюсы:*** Смотрит в будущее
+   
+   ***Минусы:***  дорого считать, статические препятствия, предопределенная траектория, необходимость haptics feedback системы
