@@ -31,5 +31,21 @@ literature overview
    ***Что используют:*** MPC
    
    ***Плюсы:*** Смотрит в будущее
-   
+
    ***Минусы:***  дорого считать, статические препятствия, предопределенная траектория, необходимость haptics feedback системы
+
+3. [NAOqi Framework](http://doc.aldebaran.com/2-1/naoqi/motion/reflexes-collision-avoidance.html)
+
+   ***Что делают:**  main software that runs on the robot and controls it.
+   
+   ***Подход:*** Самый-самый простой способ предсказания наличия коллизий в будущем
+
+   ```math
+   \triangle t \cdot
+   ```
+   
+   ***Что используют:*** 
+   ***Плюсы:*** 
+   ***Минусы:*** 
+
+   
