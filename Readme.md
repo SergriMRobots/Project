@@ -39,9 +39,9 @@ literature overview
    ***Что делают:**  main software that runs on the robot and controls it.
    
    ***Подход:*** Самый-самый простой способ предсказания наличия коллизий в будущем
-```math
+$$
 \triangle t \cdot (\vec{n} J)\dot{q} < Dist
-```
+$$
    
    ***Что используют:*** NAOqi Framework
    
