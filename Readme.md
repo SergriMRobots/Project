@@ -112,7 +112,7 @@
 10. Neural networks (simple)
     https://www.mdpi.com/1424-8220/21/12/4235
     https://jeas.springeropen.com/counter/pdf/10.1186/s44147-023-00214-8.pdf
-
+11. [Artificial potential Field UR](https://www.mdpi.com/2076-3417/13/12/6973)
     
     
 
