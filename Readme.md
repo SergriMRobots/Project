@@ -113,6 +113,7 @@
     https://www.mdpi.com/1424-8220/21/12/4235
     https://jeas.springeropen.com/counter/pdf/10.1186/s44147-023-00214-8.pdf
 11. [Artificial potential Field UR](https://www.mdpi.com/2076-3417/13/12/6973)
+12. [APF](https://www.researchgate.net/publication/337532721_Path_Planning_for_Obstacle_Avoidance_of_Manipulators_Based_on_Improved_Artificial_Potential_Field)
     
     
 
