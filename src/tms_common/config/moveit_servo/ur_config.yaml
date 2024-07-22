@@ -1,7 +1,7 @@
 ###############################################
 # Modify all parameters related to servoing here
 ###############################################
-use_gazebo: false # Whether the robot is started in a Gazebo simulation environment
+use_gazebo: true # Whether the robot is started in a Gazebo simulation environment #FIXME
 
 ## Properties of incoming commands
 command_in_type: "unitless" # "unitless"> in the range [-1:1], as if from joystick. "speed_units"> cmds are in m/s and rad/s
@@ -20,21 +20,21 @@ low_latency_mode: false  # Set this to true to publish as soon as an incoming Tw
 # What type of topic does your robot driver expect?
 # Currently supported are std_msgs/Float64MultiArray (for ros_control JointGroupVelocityController or JointGroupPositionController)
 # or trajectory_msgs/JointTrajectory (for Universal Robots and other non-ros_control robots)
-command_out_type: std_msgs/Float64MultiArray
-#command_out_type: geometry_msgs/PoseStamped
+# command_out_type: std_msgs/Float64MultiArray
+command_out_type: geometry_msgs/PoseStamped
 
 # What to publish? Can save some bandwidth as most robots only require positions or velocities
-publish_joint_positions: false
-publish_joint_velocities: true
+publish_joint_positions: true
+publish_joint_velocities: false
 
 ## MoveIt properties
 move_group_name:  manipulator  # Often 'manipulator' or 'arm'
 planning_frame: base_link  # The MoveIt planning frame. Often 'base_link' or 'world'
-
+ee_frame_name: ee_link #FIXME tool0
 ## Other frames
-ee_frame_name: ee_link  # The name of the end effector link, used to return the EE pose
-robot_link_command_frame:  ee_link  # commands must be given in the frame of a robot link. Usually either the base or end effector
-
+# ee_frame_name: ee_link  # The name of the end effector link, used to return the EE pose
+# robot_link_command_frame:  ee_link  # commands must be given in the frame of a robot link. Usually either the base or end effector
+robot_link_command_frame: ee_link #FIXME tool0
 ## Stopping behaviour
 incoming_command_timeout:  0.5  # Stop servoing if X seconds elapse without a new command
 # If 0, republish commands forever even if the robot is stationary. Otherwise, specify num. to publish.
@@ -51,22 +51,23 @@ cartesian_command_in_topic: delta_twist_cmds  # Topic for incoming Cartesian twi
 joint_command_in_topic: delta_joint_cmds # Topic for incoming joint angle commands
 joint_topic: joint_states
 status_topic: status # Publish status to this topic
-command_out_topic: /joint_group_vel_controller/command # Publish outgoing commands here
-#command_out_topic: /cartesian_motion_controller/target_frame # Publish outgoing commands here
+# command_out_topic: /joint_group_vel_controller/command # Publish outgoing commands heres
+command_out_topic: /cartesian_motion_controller/target_frame # Publish outgoing commands here
 
 pose_stamped:
-    end_effector_link: "ee_link"    # All links below must come before this link
+    end_effector_link: "ee_link"    # All links below must come before this link #FIXME
     robot_base_link: "base_link"
 
 ## Collision checking for the entire robot body
-check_collisions: false # Check collisions?
+check_collisions: true # Check collisions?
 collision_check_rate: 50 # [Hz] Collision-checking can easily bog down a CPU if done too often.
 collisions_switch_service: /servo_server/collision/switch_service
 
 # Two collision check algorithms are available:
 # "threshold_distance" begins slowing down when nearer than a specified distance. Good if you want to tune collision thresholds manually.
 # "stop_distance" stops if a collision is nearer than the worst-case stopping distance and the distance is decreasing. Requires joint acceleration limits
-collision_check_type: threshold_distance
+# collision_check_type: threshold_distance
+collision_check_type: bullet_collision
 # Parameters for "threshold_distance"-type collision checking
 self_collision_warning_threshold_mm: 70 #Расстояние в мм для самопересечений с которого начинается экспоненциальное уменьшение коэффициента доступной скорости
 self_collision_stop_threshold_mm: 40 #Расстояние в мм для самопересечений ниже которого коэффициент ноль

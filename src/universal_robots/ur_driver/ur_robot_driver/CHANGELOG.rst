@@ -1,3 +1,75 @@
+2.1.5 (2024-06-17)
+------------------
+
+2.1.4 (2024-04-08)
+------------------
+* Added support for UR30 (`#688 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/688>`_)
+* Added arg to enable/disable launch of ursim (`#679 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/pull/679>`_)
+* Contributors: Vincenzo Di Pentima, mahp
+
+2.1.3 (2023-12-18)
+------------------
+* Added support for UR20 (`#659 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/659>`_)
+* Update documentation (`#655 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/655>`_)
+* Bump required cmake version to fix the CMake warning about CMP0048
+* Change initializer list ordering to match declaration in header file
+* Implemented spline interpolation in joint space (`#543 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/543>`_)
+* Use dedicated build for noetic main (`#640 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/640>`_)
+* fix typo and use ros logging
+* Contributors: Felix Exner, Felix Exner (fexner), Mads Holm Peters, RobertWilbrandt, Simon Schmeisser
+
+2.1.2 (2023-01-23)
+------------------
+
+2.1.1 (2023-01-23)
+------------------
+* Move controller_stopper to ur_robot_driver
+  Since a standalone package with that name was declined during the release
+  process, we decided to move the controller_stopper package over to the driver.
+* Update minimal required polyscope version in docs
+* Contributors: Felix Exner
+
+2.1.0 (2022-12-08)
+------------------
+* delete ros_control.urscript (`#593 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/593>`_)
+  We've been using the script from the library for a while now
+* Use the RobotMode message inside the SetMode action (`#381 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/381>`_)
+  This way we can make use of the predefined constants inside the RobotMode message.
+* Make several members of hw_interface atomic, for thread safety (`#448 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/448>`_)
+  Co-authored-by: Felix Exner (fexner) <exner@fzi.de>
+* Updated transformForceTorque to handle wheter it is a cb3 or an e-Series robot (`#566 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/566>`_)
+  The force torque is returned at the tool flange on e-series robots and at the tcp for CB3, this is now handled correctly, so that all force/torque measurements will be relative to the active TCP
+* Updated set payload, zero ftsensor and set tool voltage to use the ur… (`#567 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/567>`_)
+  * Updated set payload, zero ftsensor and set tool voltage to use the urdriver
+  This makes it possible to call the commands when the robot is in local control if the external control script is running on the robot.
+  * Update ROS interface docs
+  * Fix argument passing in include instruction
+  Co-authored-by: Miguel Prada <miguel.prada@tecnalia.com>
+* Remove URCap installation files from driver and replace references (`#580 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/580>`_)
+  Link to the respective Github release pages instead.
+* Drop old C++ compiler flags (`#577 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/577>`_)
+  Co-authored-by: Jochen Sprickerhof <git@jochen.sprickerhof.de>
+* Fix MoveIt! command in Example (`#575 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/575>`_)
+* Allow empty stopped_controllers argument. (`#572 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/572>`_)
+* Dashboard service to query whether the robot is in remote control (`#561 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/561>`_)
+  * new dashboard msg to check remote control
+* test_move: Load controller only if it is not already loaded (`#552 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/552>`_)
+* Add optional topic rename for speed scaling factor (`#544 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/544>`_)
+  * Add optional topic rename for speed scaling factor
+  * Update ROS_INTERFACE.md
+* Wait for controller action server in test_move. (`#535 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/535>`_)
+* Minor update to display robot_ip parameter without _ (`#521 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/521>`_)
+* Make hw_interface-node required-argument optional (`#450 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/450>`_)
+  The UR-robot is only one part of our roslaunch-setup, so I would like to be able to have the rest of the system (non-UR) continue to run even if the ur_hardware_interface-node dies.
+* Fix test move python3 (`#492 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/492>`_)
+  * make test_move work with python2 and python3
+  As suggested in http://wiki.ros.org/UsingPython3/SourceCodeChanges#Changing_shebangs
+  - Use a version-independent shebang
+  - Use catkin_install_python to install the test_move script
+* Update feature list (`#490 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/490>`_)
+  Some minor formatting and reducing the wrench features to one features to make it more clear.
+* Contributors: Adam Heins, AndyZe, Felix Exner, Felix Exner (fexner), Johnson, Mads Holm Peters, Michael Görner, Mingu Kwon, steinmn, teapfw, williamnavaraj
+
 2.0.0 (2021-09-07)
 ------------------
 * Merge pull request `#408 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/408>`_ from UniversalRobots/staging

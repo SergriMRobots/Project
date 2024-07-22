@@ -62,6 +62,7 @@ class ThresholdDistanceCollisionCheck : public CollisionCheck
     double computeScale(double current_dist);
 
   public:
+    // double computeScale(double current_dist);
     static Threshold Factory(double warn, double stop, const CoefType& type);
     /**
      * @brief Проверяет есть ли в структуре value границы для типа type
@@ -146,6 +147,7 @@ class ThresholdDistanceCollisionCheck : public CollisionCheck
    * @return ScaleResult - минимальный scale исходя из данных в collision_result
    */
   ScaleResult getScaleMinimum(const CollisionCheckingResult& collision_result);
+  double computeScale_lite(double current_dist); //FIXME
 
   double calcIteration(const sensor_msgs::JointState& now, const sensor_msgs::JointState& future) override;
 

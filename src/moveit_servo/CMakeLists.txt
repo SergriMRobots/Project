@@ -87,6 +87,7 @@ set(SERVO_LIB_NAME
   src/collision_check.cpp
   src/stop_distance_collision_check.cpp
   src/threshold_distance_check.cpp
+  src/bullet_collision.cpp
   src/servo_calcs.cpp
   ${SERVO_CALC_STUFF}
   src/servo.cpp
@@ -112,6 +113,15 @@ add_executable(servo_server
 )
 add_dependencies(servo_server ${catkin_EXPORTED_TARGETS})
 target_link_libraries(servo_server
+  ${catkin_LIBRARIES}
+)
+
+add_executable(add_object
+  ${SERVO_LIB_NAME}
+  src/add_object.cpp
+)
+add_dependencies(add_object ${catkin_EXPORTED_TARGETS})
+target_link_libraries(add_object
   ${catkin_LIBRARIES}
 )
 

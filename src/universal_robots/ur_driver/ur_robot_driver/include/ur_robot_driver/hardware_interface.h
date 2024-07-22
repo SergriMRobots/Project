@@ -38,6 +38,7 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/String.h>
 #include <std_srvs/Trigger.h>
+#include <std_srvs/SetBool.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <tf2_msgs/TFMessage.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -52,6 +53,7 @@
 #include <ur_msgs/ToolDataMsg.h>
 #include <ur_msgs/SetIO.h>
 #include <ur_msgs/SetSpeedSliderFraction.h>
+#include <ur_msgs/SetPayload.h>
 
 #include <cartesian_interface/cartesian_command_interface.h>
 #include <cartesian_interface/cartesian_state_handle.h>
@@ -170,8 +172,6 @@ public:
 protected:
   /*!
    * \brief Transforms force-torque measurements reported from the robot from base to tool frame.
-   *
-   * Requires extractToolPose() to be run first.
    */
   void transformForceTorque();
 
@@ -213,6 +213,8 @@ protected:
   bool resendRobotProgram(std_srvs::TriggerRequest& req, std_srvs::TriggerResponse& res);
   bool zeroFTSensor(std_srvs::TriggerRequest& req, std_srvs::TriggerResponse& res);
   void commandCallback(const std_msgs::StringConstPtr& msg);
+  bool setPayload(ur_msgs::SetPayloadRequest& req, ur_msgs::SetPayloadResponse& res);
+  bool activateSplineInterpolation(std_srvs::SetBoolRequest& req, std_srvs::SetBoolResponse& res);
 
   std::unique_ptr<urcl::UrDriver> ur_driver_;
   std::unique_ptr<DashboardClientROS> dashboard_client_;
@@ -236,6 +238,7 @@ protected:
   ros::ServiceServer deactivate_srv_;
   ros::ServiceServer tare_sensor_srv_;
   ros::ServiceServer set_payload_srv_;
+  ros::ServiceServer activate_spline_interpolation_srv_;
 
   hardware_interface::JointStateInterface js_interface_;
   scaled_controllers::ScaledPositionJointInterface spj_interface_;
@@ -281,6 +284,7 @@ protected:
   urcl::vector6d_t target_tcp_speed_;
   urcl::vector6d_t cartesian_velocity_command_;
   urcl::vector6d_t cartesian_pose_command_;
+  urcl::vector6d_t tcp_offset_;
 
   std::bitset<18> actual_dig_out_bits_;
   std::bitset<18> actual_dig_in_bits_;
@@ -293,8 +297,6 @@ protected:
   int32_t tool_output_voltage_;
   double tool_output_current_;
   double tool_temperature_;
-  tf2::Vector3 tcp_force_;
-  tf2::Vector3 tcp_torque_;
   geometry_msgs::TransformStamped tcp_transform_;
   double speed_scaling_;
   double target_speed_fraction_;
@@ -320,21 +322,22 @@ protected:
   industrial_robot_status_interface::IndustrialRobotStatusInterface robot_status_interface_{};
 
   uint32_t runtime_state_;
-  bool position_controller_running_;
-  bool velocity_controller_running_;
-  bool joint_forward_controller_running_;
-  bool cartesian_forward_controller_running_;
-  bool twist_controller_running_;
-  bool pose_controller_running_;
+  std::atomic<bool> position_controller_running_;
+  std::atomic<bool> velocity_controller_running_;
+  std::atomic<bool> joint_forward_controller_running_;
+  std::atomic<bool> cartesian_forward_controller_running_;
+  std::atomic<bool> twist_controller_running_;
+  std::atomic<bool> pose_controller_running_;
+  std::atomic<bool> use_spline_interpolation_;
 
   PausingState pausing_state_;
   double pausing_ramp_up_increment_;
 
   std::string tcp_link_;
-  bool robot_program_running_;
+  std::atomic<bool> robot_program_running_;
   ros::Publisher program_state_pub_;
 
-  bool controller_reset_necessary_;
+  std::atomic<bool> controller_reset_necessary_;
   bool controllers_initialized_;
 
   bool packet_read_;

@@ -61,7 +61,8 @@ namespace moveit_servo
 enum CollisionCheckType
 {
   K_THRESHOLD_DISTANCE = 1,
-  K_STOP_DISTANCE = 2
+  K_STOP_DISTANCE = 2,
+  K_BULLET_DISTANCE = 3
 };
 
 /**
@@ -91,7 +92,9 @@ public:
   {
     return collision_check_type_;
   }
-
+ros::Publisher dummy_distance_publisher_; //FIXME
+planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_; //FIXME
+collision_detection::AllowedCollisionMatrix acm_;//FIXME
 private:
   bool collisionHandler(std_srvs::TriggerRequest&, std_srvs::TriggerResponse& resp);
   /** \brief Run one iteration of collision checking */
@@ -103,10 +106,10 @@ private:
   const ServoParameters& parameters_;
 
   // Pointer to the collision environment
-  planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
+  // planning_scene_monitor::PlanningSceneMonitorPtr planning_scene_monitor_;
 
-  // Robot state and collision matrix from planning scene
-  collision_detection::AllowedCollisionMatrix acm_;
+  // // Robot state and collision matrix from planning scene
+  // collision_detection::AllowedCollisionMatrix acm_;
 
   // ROS
   ros::ServiceServer collision_enable_service;

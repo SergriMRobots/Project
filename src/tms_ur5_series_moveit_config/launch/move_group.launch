@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="use_rviz"/>
-  <arg name="rviz_config" default="$(find tms_ur5_series_moveit_config)/launch/ur5/moveit_ur5.rviz"/>
+  <arg name="rviz_config" default=""/>
+  <!-- $(find tms_ur5_series_moveit_config)/launch/ur5/moveit_ur5.rviz"/> -->
   <arg name="trajectory_controller" default='trajectory'/>
 
   <!-- GDB Debug Option -->

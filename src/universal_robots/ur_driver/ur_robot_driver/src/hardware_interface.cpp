@@ -31,7 +31,6 @@
 #include <ur_client_library/ur/tool_communication.h>
 #include <ur_client_library/exceptions.h>
 
-#include <ur_msgs/SetPayload.h>
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <trajectory_msgs/JointTrajectory.h>
 #include <control_msgs/FollowJointTrajectoryAction.h>
@@ -59,11 +58,11 @@ static const std::bitset<11>
 HardwareInterface::HardwareInterface()
   : joint_position_command_({ 0, 0, 0, 0, 0, 0 })
   , joint_velocity_command_({ 0, 0, 0, 0, 0, 0 })
-  , cartesian_velocity_command_({ 0, 0, 0, 0, 0, 0 })
-  , cartesian_pose_command_({ 0, 0, 0, 0, 0, 0 })
   , joint_positions_{ { 0, 0, 0, 0, 0, 0 } }
   , joint_velocities_{ { 0, 0, 0, 0, 0, 0 } }
   , joint_efforts_{ { 0, 0, 0, 0, 0, 0 } }
+  , cartesian_velocity_command_({ 0, 0, 0, 0, 0, 0 })
+  , cartesian_pose_command_({ 0, 0, 0, 0, 0, 0 })
   , standard_analog_input_{ { 0, 0 } }
   , standard_analog_output_{ { 0, 0 } }
   , joint_names_(6)
@@ -87,13 +86,14 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
   joint_efforts_ = { { 0, 0, 0, 0, 0, 0 } };
   std::string script_filename;
   std::string wrench_frame_id;
+  std::string speed_scaling_id;
   std::string output_recipe_filename;
   std::string input_recipe_filename;
 
   // The robot's IP address.
   if (!robot_hw_nh.getParam("robot_ip", robot_ip_))
   {
-    ROS_ERROR_STREAM("Required parameter " << robot_hw_nh.resolveName("robot_ip_") << " not given.");
+    ROS_ERROR_STREAM("Required parameter " << robot_hw_nh.resolveName("robot_ip") << " not given.");
     return false;
   }
 
@@ -109,12 +109,18 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
   // Port that will be opened to send trajectory points from the driver to the robot
   int trajectory_port = robot_hw_nh.param("trajectory_port", 50003);
 
+  // Port that will be opened to forward script commands from the driver to the robot
+  int script_command_port = robot_hw_nh.param("script_command_port", 50004);
+
   // When the robot's URDF is being loaded with a prefix, we need to know it here, as well, in order
   // to publish correct frame names for frames reported by the robot directly.
   robot_hw_nh.param<std::string>("tf_prefix", tf_prefix_, "");
 
   // Optional parameter to change the id of the wrench frame
   robot_hw_nh.param<std::string>("wrench_frame_id", wrench_frame_id, "wrench");
+
+  // Optional parameter to change the id of the speed scaling topic
+  robot_hw_nh.param<std::string>("speed_scaling_id", speed_scaling_id, "speed_scaling_factor");
 
   // Path to the urscript code that will be sent to the robot.
   if (!robot_hw_nh.getParam("script_file", script_filename))
@@ -169,6 +175,10 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
     ROS_ERROR_STREAM("servoj_lookahead_time is " << servoj_lookahead_time << ", must be in range [0.03, 0.2]");
     return false;
   }
+
+  // True if splines should be used as interpolation on the robot controller when forwarding trajectory, if false movej
+  // or movel commands are used
+  use_spline_interpolation_ = robot_hw_nh.param<bool>("use_spline_interpolation", "true");
 
   // Whenever the runtime state of the "External Control" program node in the UR-program changes, a
   // message gets published here. So this is equivalent to the information whether the robot accepts
@@ -281,7 +291,7 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
         robot_ip_, script_filename, output_recipe_filename, input_recipe_filename,
         std::bind(&HardwareInterface::handleRobotProgramState, this, std::placeholders::_1), headless_mode,
         std::move(tool_comm_setup), (uint32_t)reverse_port, (uint32_t)script_sender_port, servoj_gain,
-        servoj_lookahead_time, non_blocking_read_, reverse_ip, trajectory_port));
+        servoj_lookahead_time, non_blocking_read_, reverse_ip, trajectory_port, script_command_port));
   }
   catch (urcl::ToolCommNotAvailable& e)
   {
@@ -290,7 +300,10 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
   }
   catch (urcl::UrException& e)
   {
-    ROS_FATAL_STREAM(e.what());
+    ROS_FATAL_STREAM(e.what() << std::endl
+                              << "Please note that the minimum software version required is 3.12.0 for CB3 robots and "
+                                 "5.5.1 for e-Series robots. The error above could be related to a non-supported "
+                                 "polyscope version. Please update your robot's software accordingly.");
     return false;
   }
   URCL_LOG_INFO("Checking if calibration data matches connected robot.");
@@ -348,8 +361,7 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
         js_interface_.getHandle(joint_names_[i]), &joint_velocity_command_[i], &speed_scaling_combined_));
   }
 
-  speedsc_interface_.registerHandle(
-      scaled_controllers::SpeedScalingHandle("speed_scaling_factor", &speed_scaling_combined_));
+  speedsc_interface_.registerHandle(scaled_controllers::SpeedScalingHandle(speed_scaling_id, &speed_scaling_combined_));
 
   fts_interface_.registerHandle(hardware_interface::ForceTorqueSensorHandle(
       wrench_frame_id, tf_prefix_ + "tool0_controller", fts_measurements_.begin(), fts_measurements_.begin() + 3));
@@ -437,25 +449,19 @@ bool HardwareInterface::init(ros::NodeHandle& root_nh, ros::NodeHandle& robot_hw
   // Calling this service will make the "External Control" program node on the UR-Program return.
   deactivate_srv_ = robot_hw_nh.advertiseService("hand_back_control", &HardwareInterface::stopControl, this);
 
-  // Calling this service will zero the robot's ftsensor. Note: On e-Series robots this will only
-  // work when the robot is in remote-control mode.
+  // Calling this service will zero the robot's ftsensor (only available for e-Series).
   tare_sensor_srv_ = robot_hw_nh.advertiseService("zero_ftsensor", &HardwareInterface::zeroFTSensor, this);
+
+  // Setup the mounted payload through a ROS service
+  set_payload_srv_ = robot_hw_nh.advertiseService("set_payload", &HardwareInterface::setPayload, this);
+
+  // Call this to activate or deactivate using spline interpolation locally on the UR controller, when forwarding
+  // trajectories to the UR robot.
+  activate_spline_interpolation_srv_ = robot_hw_nh.advertiseService(
+      "activate_spline_interpolation", &HardwareInterface::activateSplineInterpolation, this);
 
   ur_driver_->startRTDECommunication();
   ROS_INFO_STREAM_NAMED("hardware_interface", "Loaded ur_robot_driver hardware_interface");
-
-  // Setup the mounted payload through a ROS service
-  set_payload_srv_ = robot_hw_nh.advertiseService<ur_msgs::SetPayload::Request, ur_msgs::SetPayload::Response>(
-      "set_payload", [&](ur_msgs::SetPayload::Request& req, ur_msgs::SetPayload::Response& resp) {
-        std::stringstream cmd;
-        cmd.imbue(std::locale::classic());  // Make sure, decimal divider is actually '.'
-        cmd << "sec setup():" << std::endl
-            << " set_payload(" << req.mass << ", [" << req.center_of_gravity.x << ", " << req.center_of_gravity.y
-            << ", " << req.center_of_gravity.z << "])" << std::endl
-            << "end";
-        resp.success = this->ur_driver_->sendScript(cmd.str());
-        return true;
-      });
 
   return true;
 }
@@ -530,6 +536,7 @@ void HardwareInterface::read(const ros::Time& time, const ros::Duration& period)
     readBitsetData<uint64_t>(data_pkg, "actual_digital_output_bits", actual_dig_out_bits_);
     readBitsetData<uint32_t>(data_pkg, "analog_io_types", analog_io_types_);
     readBitsetData<uint32_t>(data_pkg, "tool_analog_input_types", tool_analog_input_types_);
+    readData(data_pkg, "tcp_offset", tcp_offset_);
 
     cart_pose_.position.x = tcp_pose_[0];
     cart_pose_.position.y = tcp_pose_[1];
@@ -552,13 +559,6 @@ void HardwareInterface::read(const ros::Time& time, const ros::Duration& period)
     cart_twist_.angular.y = tcp_speed_[4];
     cart_twist_.angular.z = tcp_speed_[5];
 
-    KDL::Vector vec = KDL::Vector(tcp_pose_[3], tcp_pose_[4], tcp_pose_[5]);
-
-    double angle = vec.Normalize();
-
-    KDL::Rotation rot = KDL::Rotation::Rot(vec, angle);
-    rot.GetQuaternion(cart_pose_.orientation.x, cart_pose_.orientation.y, cart_pose_.orientation.z,
-                      cart_pose_.orientation.w);
     extractRobotStatus();
 
     publishIOData();
@@ -864,16 +864,42 @@ uint32_t HardwareInterface::getControlFrequency() const
 
 void HardwareInterface::transformForceTorque()
 {
-  tcp_force_.setValue(fts_measurements_[0], fts_measurements_[1], fts_measurements_[2]);
-  tcp_torque_.setValue(fts_measurements_[3], fts_measurements_[4], fts_measurements_[5]);
+  KDL::Wrench ft(KDL::Vector(fts_measurements_[0], fts_measurements_[1], fts_measurements_[2]),
+                 KDL::Vector(fts_measurements_[3], fts_measurements_[4], fts_measurements_[5]));
+  if (ur_driver_->getVersion().major >= 5)  // e-Series
+  {
+    // Setup necessary frames
+    KDL::Vector vec = KDL::Vector(tcp_offset_[3], tcp_offset_[4], tcp_offset_[5]);
+    double angle = vec.Normalize();
+    KDL::Rotation rotation = KDL::Rotation::Rot(vec, angle);
+    KDL::Frame flange_to_tcp = KDL::Frame(rotation, KDL::Vector(tcp_offset_[0], tcp_offset_[1], tcp_offset_[2]));
 
-  tf2::Quaternion rotation_quat;
-  tf2::fromMsg(tcp_transform_.transform.rotation, rotation_quat);
-  tcp_force_ = tf2::quatRotate(rotation_quat.inverse(), tcp_force_);
-  tcp_torque_ = tf2::quatRotate(rotation_quat.inverse(), tcp_torque_);
+    vec = KDL::Vector(target_tcp_pose_[3], target_tcp_pose_[4], target_tcp_pose_[5]);
+    angle = vec.Normalize();
+    rotation = KDL::Rotation::Rot(vec, angle);
+    KDL::Frame base_to_tcp =
+        KDL::Frame(rotation, KDL::Vector(target_tcp_pose_[0], target_tcp_pose_[1], target_tcp_pose_[2]));
 
-  fts_measurements_ = { tcp_force_.x(),  tcp_force_.y(),  tcp_force_.z(),
-                        tcp_torque_.x(), tcp_torque_.y(), tcp_torque_.z() };
+    // Calculate transformation from base to flange, see calculation details below
+    // `base_to_tcp = base_to_flange*flange_to_tcp -> base_to_flange = base_to_tcp * inv(flange_to_tcp)`
+    KDL::Frame base_to_flange = base_to_tcp * flange_to_tcp.Inverse();
+
+    // rotate f/t sensor output back to the flange frame
+    ft = base_to_flange.M.Inverse() * ft;
+
+    // Transform the wrench to the tcp frame
+    ft = flange_to_tcp * ft;
+  }
+  else  // CB3
+  {
+    KDL::Vector vec = KDL::Vector(target_tcp_pose_[3], target_tcp_pose_[4], target_tcp_pose_[5]);
+    double angle = vec.Normalize();
+    KDL::Rotation base_to_tcp_rot = KDL::Rotation::Rot(vec, angle);
+
+    // rotate f/t sensor output back to the tcp frame
+    ft = base_to_tcp_rot.Inverse() * ft;
+  }
+  fts_measurements_ = { ft[0], ft[1], ft[2], ft[3], ft[4], ft[5] };
 }
 
 bool HardwareInterface::isRobotProgramRunning() const
@@ -1092,6 +1118,10 @@ bool HardwareInterface::setIO(ur_msgs::SetIORequest& req, ur_msgs::SetIOResponse
   {
     res.success = ur_driver_->getRTDEWriter().sendStandardAnalogOutput(req.pin, req.state);
   }
+  else if (req.fun == req.FUN_SET_TOOL_VOLTAGE && ur_driver_ != nullptr)
+  {
+    res.success = ur_driver_->setToolVoltage(static_cast<urcl::ToolVoltage>(req.state));
+  }
   else
   {
     ROS_ERROR("Cannot execute function %u. This is not (yet) supported.", req.fun);
@@ -1130,11 +1160,18 @@ bool HardwareInterface::zeroFTSensor(std_srvs::TriggerRequest& req, std_srvs::Tr
   }
   else
   {
-    res.success = this->ur_driver_->sendScript(R"(sec tareSensor():
-  zero_ftsensor()
-end
-)");
+    res.success = this->ur_driver_->zeroFTSensor();
   }
+  return true;
+}
+
+bool HardwareInterface::setPayload(ur_msgs::SetPayloadRequest& req, ur_msgs::SetPayloadResponse& res)
+{
+  urcl::vector3d_t cog;
+  cog[0] = req.center_of_gravity.x;
+  cog[1] = req.center_of_gravity.y;
+  cog[2] = req.center_of_gravity.z;
+  res.success = this->ur_driver_->setPayload(req.mass, cog);
   return true;
 }
 
@@ -1160,6 +1197,21 @@ void HardwareInterface::commandCallback(const std_msgs::StringConstPtr& msg)
   {
     ROS_ERROR_STREAM("Error sending script to robot");
   }
+}
+
+bool HardwareInterface::activateSplineInterpolation(std_srvs::SetBoolRequest& req, std_srvs::SetBoolResponse& res)
+{
+  use_spline_interpolation_ = req.data;
+  if (use_spline_interpolation_)
+  {
+    res.message = "Activated spline interpolation in forward trajectory mode.";
+  }
+  else
+  {
+    res.message = "Deactivated spline interpolation in forward trajectory mode.";
+  }
+  res.success = true;
+  return true;
 }
 
 void HardwareInterface::publishRobotAndSafetyMode()
@@ -1227,7 +1279,46 @@ void HardwareInterface::startJointInterpolation(const hardware_interface::JointT
     p[4] = point.positions[4];
     p[5] = point.positions[5];
     double next_time = point.time_from_start.toSec();
-    ur_driver_->writeTrajectoryPoint(p, false, next_time - last_time);
+    if (!use_spline_interpolation_)
+    {
+      ur_driver_->writeTrajectoryPoint(p, false, next_time - last_time);
+    }
+    else  // Use spline interpolation
+    {
+      if (point.velocities.size() == 6 && point.accelerations.size() == 6)
+      {
+        urcl::vector6d_t v, a;
+        v[0] = point.velocities[0];
+        v[1] = point.velocities[1];
+        v[2] = point.velocities[2];
+        v[3] = point.velocities[3];
+        v[4] = point.velocities[4];
+        v[5] = point.velocities[5];
+
+        a[0] = point.accelerations[0];
+        a[1] = point.accelerations[1];
+        a[2] = point.accelerations[2];
+        a[3] = point.accelerations[3];
+        a[4] = point.accelerations[4];
+        a[5] = point.accelerations[5];
+        ur_driver_->writeTrajectorySplinePoint(p, v, a, next_time - last_time);
+      }
+      else if (point.velocities.size() == 6)
+      {
+        urcl::vector6d_t v;
+        v[0] = point.velocities[0];
+        v[1] = point.velocities[1];
+        v[2] = point.velocities[2];
+        v[3] = point.velocities[3];
+        v[4] = point.velocities[4];
+        v[5] = point.velocities[5];
+        ur_driver_->writeTrajectorySplinePoint(p, v, next_time - last_time);
+      }
+      else
+      {
+        ROS_ERROR_THROTTLE(1, "Spline interpolation using positions only is not supported.");
+      }
+    }
     last_time = next_time;
   }
   ROS_DEBUG("Finished Sending Trajectory");

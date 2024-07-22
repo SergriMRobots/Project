@@ -129,6 +129,7 @@ CollisionCheck::CollisionCheck(ros::NodeHandle& nh, const moveit_servo::ServoPar
   ROS_DEBUG_STREAM_NAMED("world_distance_map", "Init");
   ROS_DEBUG_STREAM_NAMED("self_minimal_distance", "Init");
   ROS_DEBUG_STREAM_NAMED("self_distance_map", "Init");
+  dummy_distance_publisher_ = nh_.advertise<std_msgs::Float64>("/collision_test_distance", ROS_QUEUE_SIZE); //FIXME
 }
 
 CollisionCheck::~CollisionCheck()
@@ -234,7 +235,15 @@ double CollisionCheck::getScaleCoef(const sensor_msgs::JointState& now, const se
   {
     static ros::Duration max_elapsed;
     auto start = ros::Time::now();
-    auto scale = calcIteration(now, future);
+    auto scale = 1.0; //calcIteration(now, future); //FIXME
+
+    auto dummy = calcIteration(now, future); //FIXME
+    //distance 
+    std_msgs::Float64 collision_test_distance;//FIXME
+    collision_test_distance.data = dummy;//FIXME
+    dummy_distance_publisher_.publish(collision_test_distance); //FIXME
+
+
     ROS_DEBUG_STREAM_NAMED("collision_check_scale", "Calculated scale : " << scale);
     auto current = ros::Time::now() - start;
     ROS_DEBUG_STREAM_NAMED("collision_check_elapsed", "Elapsed time: " << current);

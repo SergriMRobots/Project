@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.0.2)
 project(ur_robot_driver)
 
 add_definitions( -DROS_BUILD )
@@ -8,11 +8,20 @@ if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
+# Default to off as this only works in environments where a new docker container can be started with the appropriate networking, which
+# might not be possible e.g. inside the buildfarm
+option(
+  UR_ROBOT_DRIVER_BUILD_INTEGRATION_TESTS
+  "Build integration tests using the start_ursim script"
+  OFF
+)
+
 find_package(catkin REQUIRED
   COMPONENTS
     actionlib
     control_msgs
     controller_manager
+    controller_manager_msgs
     geometry_msgs
     hardware_interface
     industrial_robot_status_interface
@@ -43,8 +52,9 @@ catkin_package(
     urcl_log_handler
   CATKIN_DEPENDS
     actionlib
-    controller_manager
     control_msgs
+    controller_manager
+    controller_manager_msgs
     geometry_msgs
     hardware_interface
     kdl_parser
@@ -66,18 +76,6 @@ catkin_package(
     Boost
     ur_client_library
 )
-
-# check c++11 / c++0x
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-if(COMPILER_SUPPORTS_CXX11)
-  add_compile_options(-std=c++11)
-elseif(COMPILER_SUPPORTS_CXX0X)
-  add_compile_options(-std=c++0x)
-else()
-  message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler. Suggested solution: update the pkg build-essential ")
-endif()
 
 add_compile_options(-Wall)
 add_compile_options(-Wextra)
@@ -124,20 +122,32 @@ add_executable(robot_state_helper
 target_link_libraries(robot_state_helper ${catkin_LIBRARIES} ur_client_library::urcl)
 add_dependencies(robot_state_helper ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
+
+add_executable(controller_stopper_node
+  src/controller_stopper.cpp
+  src/controller_stopper_node.cpp
+)
+add_dependencies(controller_stopper_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(controller_stopper_node
+  ${catkin_LIBRARIES}
+)
+
 if(CATKIN_ENABLE_TESTING)
   find_package(rostest REQUIRED)
 
-  add_rostest(test/driver.test)
+  if(${UR_ROBOT_DRIVER_BUILD_INTEGRATION_TESTS})
+    add_rostest(test/driver.test)
+  endif()
 endif()
 
 
-install(TARGETS ur_robot_driver_plugin urcl_log_handler ur_robot_driver_node robot_state_helper dashboard_client
+install(TARGETS ur_robot_driver_plugin urcl_log_handler ur_robot_driver_node robot_state_helper dashboard_client controller_stopper_node
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
-catkin_install_python(PROGRAMS scripts/tool_communication
+catkin_install_python(PROGRAMS scripts/tool_communication scripts/test_move
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY config launch resources

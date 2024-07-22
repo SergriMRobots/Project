@@ -231,7 +231,7 @@ bool Servo::readParameters()
     return false;
   }
   // Collision checking
-  if (parameters_.collision_check_type != "threshold_distance" && parameters_.collision_check_type != "stop_distance")
+  if (parameters_.collision_check_type != "threshold_distance" && parameters_.collision_check_type != "stop_distance" && parameters_.collision_check_type != "bullet_collision")
   {
     ROS_WARN_NAMED(LOGNAME, "collision_check_type must be 'threshold_distance' or 'stop_distance'");
     return false;

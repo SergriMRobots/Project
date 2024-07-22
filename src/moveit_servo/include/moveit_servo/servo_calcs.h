@@ -68,6 +68,7 @@
 #include <moveit_servo/status_codes.h>
 #include <moveit_servo/stop_distance_collision_check.h>
 #include <moveit_servo/threshold_distance_check.h>
+#include <moveit_servo/bullet_collision.h>
 
 #include "Eigen/src/Core/Array.h"
 #include "moveit_servo/3rdparty_header/expected.hpp"

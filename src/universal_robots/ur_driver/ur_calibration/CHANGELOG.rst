@@ -1,3 +1,30 @@
+2.1.5 (2024-06-17)
+------------------
+* Fix calibration (`#704 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/704>`_)
+* Contributors: Felix Exner (fexner)
+
+2.1.4 (2024-04-08)
+------------------
+
+2.1.3 (2023-12-18)
+------------------
+* Bump cmake minimum version for all packages in repo
+* Contributors: Felix Exner
+
+2.1.2 (2023-01-23)
+------------------
+
+2.1.1 (2023-01-23)
+------------------
+
+2.1.0 (2022-12-08)
+------------------
+* fix dependency for the organization calibration package (`#549 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/549>`_)
+* Drop old C++ compiler flags (`#577 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/577>`_)
+  Co-authored-by: Jochen Sprickerhof <git@jochen.sprickerhof.de>
+* Remove boilerplate comments from package.xml files (`#528 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/528>`_)
+* Contributors: Captain Yoshi, Felix Exner, Michael Görner
+
 2.0.0 (2021-09-07)
 ------------------
 * Add new features to the driver:

@@ -165,6 +165,40 @@ ThresholdDistanceCollisionCheck::getScaleMinimum(const CollisionCheckingResult& 
   return self_minimum;
 }
 
+
+double ThresholdDistanceCollisionCheck::Threshold::computeScale(double current_dist)
+{
+  if (current_dist > warn)
+    return 1.0;
+  else if (current_dist <= warn && current_dist > stop)
+  {
+    double k = 1 / (warn - stop);
+    double b = -k * stop;
+    return k * current_dist + b;
+  }
+  else
+    return 0.0;
+}
+
+double ThresholdDistanceCollisionCheck::computeScale_lite(double current_dist) //FIXME
+{
+  double warn=0;//FIXME
+  double stop=3;//FIXME 
+  if (current_dist > warn)
+    return 1.0;
+  else if (current_dist <= warn && current_dist > stop)
+  {
+    double k = 1 / (warn - stop);
+    double b = -k * stop;
+    return k * current_dist + b;
+  }
+  else
+    return 0.0;
+}
+
+
+
+
 double ThresholdDistanceCollisionCheck::calcIteration(const sensor_msgs::JointState&,
                                                       const sensor_msgs::JointState& future)
 {
@@ -174,69 +208,88 @@ double ThresholdDistanceCollisionCheck::calcIteration(const sensor_msgs::JointSt
   moveit::core::RobotState future_state = now_state;
   future_state.setVariableValues(future);
 
-#if THRESHOLD_PARALLEL_COLLISION_CHECK == 1
-  auto current =
-      std::async(std::launch::async, [this, &now_state]() { return computeCollisionResultForState(now_state); });
-  auto next =
-      std::async(std::launch::async, [this, &future_state]() { return computeCollisionResultForState(future_state); });
-  current.wait();
-  next.wait();
-  auto current_dist = current.get();
-  auto future_dist = next.get();
-#else
-  auto current_dist = computeCollisionResultForState(now_state);
+// #if THRESHOLD_PARALLEL_COLLISION_CHECK == 1
+  // auto current =
+      // std::async(std::launch::async, [this, &now_state]() { return computeCollisionResultForState(now_state); });
+  // auto next =
+      // std::async(std::launch::async, [this, &future_state]() { return computeCollisionResultForState(future_state); });
+  // current.wait();
+  // next.wait();
+  // auto current_dist = current.get();
+  // auto future_dist = next.get();
+// #else
+  // auto current_dist = computeCollisionResultForState(now_state);
   auto future_dist = computeCollisionResultForState(future_state);
-#endif
+  // ROS_DEBUG_STREAM_NAMED("for_my_debug",
+  //                        "\nCurrent_dist_debug: "
+  //                            << current_dist
+  //                            << "-----------------");
+// #endif
 
-  auto current_minimum_pair = getScaleMinimum(current_dist);
-  auto future_minimum_pair = getScaleMinimum(future_dist);
+  // auto current_minimum_pair = getScaleMinimum(current_dist);
+  // auto future_minimum_pair = getScaleMinimum(future_dist);
 
-  double current_scale_coef = current_minimum_pair.scale;
-  double future_scale_coef = future_minimum_pair.scale;
+  // double current_scale_coef = 1.0; //current_minimum_pair.scale;//FIXME
+  // double future_scale_coef = future_minimum_pair.scale;//FIXME
+  auto future_scale_coef = computeScale_lite(future_dist.self_minimum_distance.distance);//future_minimum_pair.scale;
+  // ROS_DEBUG_STREAM_NAMED("current_collision_distance",
+  //                        "\nCurrent minimum dist: "
+  //                            << current_minimum_pair.dist * 1000 << " mm\nPair: "
+  //                            << std::quoted(current_minimum_pair.pair.first + "-" + current_minimum_pair.pair.second)
+  //                            << "\nScale: " << current_scale_coef);
+  // ROS_DEBUG_STREAM_NAMED("future_collision_distance",
+  //                        "\nFuture minimum dist: "
+  //                            << future_minimum_pair.dist * 1000 << " mm\nPair: "
+  //                            << std::quoted(future_minimum_pair.pair.first + "-" + future_minimum_pair.pair.second)
+  //                            << "\nScale: " << future_scale_coef);
+  // if (current_scale_coef < 1.0)
+  // {
+  //   // if (current_scale_coef == 0.0 && future_scale_coef == 0.0)
+  //   // {
+  //   //   // ROS_DEBUG_NAMED("threshold_decision", "Both coefs is zero stop moving");
+  //   //   return 0.0;
+  //   // }
+  //   if (current_scale_coef >= future_scale_coef)
+  //   {
+  //     // ROS_DEBUG_NAMED("threshold_decision",
+  //     //                 "Current pose already in warning, but future pose more worth."
+  //     //                 "Use coef "
+  //     //                 "from future: %f",
+  //     //                 future_scale_coef);
+  //     return future_scale_coef;
+  //   }
+  //   else
+  //   {
+  //     // ROS_DEBUG_NAMED("threshold_decision", "Current pose already in warning, but future pose good. Use coef "
+  //     //                                       "1.0");
+  //     return 1.0;
+  //   }
+  // }
+  // if (future_scale_coef < 1.0)
+  // {
+    // ROS_DEBUG_NAMED("threshold_decision",
+    //                 "Current pose is OK, but future pose already in warning. Use coef from "
+    //                 "future: %f",
+    //                 future_scale_coef);
+    // return future_scale_coef;//FIXME
+    collision_detection::CollisionResult res;
+    collision_detection::CollisionRequest req;
+    req.contacts = true;
+    req.max_contacts = 100;
+    req.max_contacts_per_pair = 5;
+    req.verbose = false;
+    req.distance=true;
+    res.clear();
+    // state.setVariableValues(now);
+    planning_scene_monitor_->getPlanningScene()->checkCollision(req, res);
+    auto current_dist = res.distance;
 
-  ROS_DEBUG_STREAM_NAMED("current_collision_distance",
-                         "\nCurrent minimum dist: "
-                             << current_minimum_pair.dist * 1000 << " mm\nPair: "
-                             << std::quoted(current_minimum_pair.pair.first + "-" + current_minimum_pair.pair.second)
-                             << "\nScale: " << current_scale_coef);
-  ROS_DEBUG_STREAM_NAMED("future_collision_distance",
-                         "\nFuture minimum dist: "
-                             << future_minimum_pair.dist * 1000 << " mm\nPair: "
-                             << std::quoted(future_minimum_pair.pair.first + "-" + future_minimum_pair.pair.second)
-                             << "\nScale: " << future_scale_coef);
-  if (current_scale_coef < 1.0)
-  {
-    if (current_scale_coef == 0.0 && future_scale_coef == 0.0)
-    {
-      ROS_DEBUG_NAMED("threshold_decision", "Both coefs is zero stop moving");
-      return 0.0;
-    }
-    if (current_scale_coef >= future_scale_coef)
-    {
-      ROS_DEBUG_NAMED("threshold_decision",
-                      "Current pose already in warning, but future pose more worth."
-                      "Use coef "
-                      "from future: %f",
-                      future_scale_coef);
-      return future_scale_coef;
-    }
-    else
-    {
-      ROS_DEBUG_NAMED("threshold_decision", "Current pose already in warning, but future pose good. Use coef "
-                                            "1.0");
-      return 1.0;
-    }
-  }
-  if (future_scale_coef < 1.0)
-  {
-    ROS_DEBUG_NAMED("threshold_decision",
-                    "Current pose is OK, but future pose already in warning. Use coef from "
-                    "future: %f",
-                    future_scale_coef);
-    return future_scale_coef;
-  }
-  ROS_DEBUG_NAMED("threshold_decision", "Current pose is OK, Future pose is OK. Use coef 1.0");
-  return 1.0;  //Штатное движение
+
+    // return future_dist.self_minimum_distance.distance;
+    return current_dist;
+  // }
+  // ROS_DEBUG_NAMED("threshold_decision", "Current pose is OK, Future pose is OK. Use coef 1.0");
+  // return 1.0;  //Штатное движение
 }
 
 ThresholdDistanceCollisionCheck::ThresholdDistanceCollisionCheck(
@@ -357,19 +410,19 @@ ThresholdDistanceCollisionCheck::Threshold::Factory(const XmlRpc::XmlRpcValue& v
   return Factory(values[0], values[1], type);
 }
 
-double ThresholdDistanceCollisionCheck::Threshold::computeScale(double current_dist)
-{
-  if (current_dist > warn)
-    return 1.0;
-  else if (current_dist <= warn && current_dist > stop)
-  {
-    double k = 1 / (warn - stop);
-    double b = -k * stop;
-    return k * current_dist + b;
-  }
-  else
-    return 0.0;
-}
+// double ThresholdDistanceCollisionCheck::Threshold::computeScale(double current_dist)
+// {
+//   if (current_dist > warn)
+//     return 1.0;
+//   else if (current_dist <= warn && current_dist > stop)
+//   {
+//     double k = 1 / (warn - stop);
+//     double b = -k * stop;
+//     return k * current_dist + b;
+//   }
+//   else
+//     return 0.0;
+// }
 
 ThresholdDistanceCollisionCheck::ScaleResult ThresholdDistanceCollisionCheck::Threshold::computeScale(
     const LinkPair& joint_pair, const std::vector<collision_detection::DistanceResultsData>& dist_data, CoefType type)

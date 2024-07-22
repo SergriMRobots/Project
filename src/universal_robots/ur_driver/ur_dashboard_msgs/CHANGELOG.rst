@@ -2,6 +2,36 @@
 Changelog for package ur_dashboard_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.5 (2024-06-17)
+------------------
+
+2.1.4 (2024-04-08)
+------------------
+
+2.1.3 (2023-12-18)
+------------------
+* Bump cmake minimum version for all packages in repo
+* Contributors: Felix Exner
+
+2.1.2 (2023-01-23)
+------------------
+* Add license file at root and in msgs package (`#594 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/594>`_)
+* Contributors: Felix Exner (fexner)
+
+2.1.1 (2023-01-23)
+------------------
+
+2.1.0 (2022-12-08)
+------------------
+* Use the RobotMode message inside the SetMode action (`#381 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/381>`_)
+  This way we can make use of the predefined constants inside the RobotMode message.
+* Drop old C++ compiler flags (`#577 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/577>`_)
+  Co-authored-by: Jochen Sprickerhof <git@jochen.sprickerhof.de>
+* Remove boilerplate comments from package.xml files (`#528 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/528>`_)
+* Dashboard service to query whether the robot is in remote control (`#561 <https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/issues/561>`_)
+  * new dashboard msg to check remote control
+* Contributors: Felix Exner, Felix Exner (fexner), Michael Görner, Mingu Kwon
+
 2.0.0 (2021-09-07)
 ------------------
 * Initial release

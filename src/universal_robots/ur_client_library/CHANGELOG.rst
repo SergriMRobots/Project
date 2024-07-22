@@ -2,6 +2,40 @@
 Changelog for package ur_client_library
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.7 (2024-06-03)
+------------------
+* [ci] Update CI
+  * Run downstream tests for ICI
+  * Correctly name jobs
+  * Test Jazzy driver
+* [start_ursim] Add program directory at correct location also when no model is provided
+* [start_ursim] Always check ursim version for compatibility
+* [start_ursim] Use a program folder per model
+* [ci] Update distros for prerelease test
+* Contributors: Felix Exner, Vincenzo Di Pentima
+
+1.3.6 (2024-04-04)
+------------------
+* Changed spline interpolation to use the last commanded joint velocity… (`#195 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/195>`_)
+* Contributors: Mads Holm Peters, Rune Søe-Knudsen
+
+1.3.5 (2024-02-23)
+------------------
+* Add support for UR30 in start_ursim.sh (`#193 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/193>`_)
+* Add header guard to datatypes.h (`#189 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/pull/189>`_)
+* Remove duplicated entry in clang-format file (`#188 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/pull/188>`_)
+* Wait after docker kill to prevent name conflicts (`#187 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/187>`_)
+* Contributors: Felix Exner, Robert Wilbrandt
+
+1.3.4 (2023-09-22)
+------------------
+* Make depreaction warning for keepalive_counter a warning instead of error (`#182 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/182>`_)
+* Added watchdog configuration for the reverse socket (`#178 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/178>`_)
+* Add support for ur20 in start_ursim script (`#179 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/179>`_)
+* Use pre-commit for clang-format (`#175 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/175>`_)
+* Make tcp_server retry binding the socket (`#176 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/176>`_)
+* Contributors: Felix Exner, Mads Holm Peters
+
 1.3.3 (2023-09-05)
 ------------------
 * Add support for setting socket max num tries and reconnect timeout (`#172 <https://github.com/UniversalRobots/Universal_Robots_Client_Library/issues/172>`_)

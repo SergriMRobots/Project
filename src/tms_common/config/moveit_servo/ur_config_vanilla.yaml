@@ -23,8 +23,8 @@ low_latency_mode: false  # Set this to true to publish as soon as an incoming Tw
 command_out_type: std_msgs/Float64MultiArray
 
 # What to publish? Can save some bandwidth as most robots only require positions or velocities
-publish_joint_positions: false
-publish_joint_velocities: true
+publish_joint_positions: true
+publish_joint_velocities: false
 publish_joint_accelerations: false
 
 ## MoveIt properties
@@ -32,7 +32,8 @@ move_group_name:  manipulator  # Often 'manipulator' or 'arm'
 planning_frame: base_link  # The MoveIt planning frame. Often 'base_link' or 'world'
 
 ## Other frames
-ee_frame_name: ee_link  # The name of the end effector link, used to return the EE pose
+ee_frame_name: tool0
+# ee_frame_name: ee_link  # The name of the end effector link, used to return the EE pose
 robot_link_command_frame:  base_link  # commands must be given in the frame of a robot link. Usually either the base or end effector
 
 ## Stopping behaviour
@@ -51,7 +52,7 @@ cartesian_command_in_topic: delta_twist_cmds  # Topic for incoming Cartesian twi
 joint_command_in_topic: delta_joint_cmds # Topic for incoming joint angle commands
 joint_topic: joint_states
 status_topic: status # Publish status to this topic
-command_out_topic: /joint_group_vel_controller/command # Publish outgoing commands here
+# command_out_topic: /joint_group_vel_controller/command # Publish outgoing commands here
 
 ## Collision checking for the entire robot body
 check_collisions: true # Check collisions?
@@ -59,7 +60,9 @@ collision_check_rate: 50 # [Hz] Collision-checking can easily bog down a CPU if 
 # Two collision check algorithms are available:
 # "threshold_distance" begins slowing down when nearer than a specified distance. Good if you want to tune collision thresholds manually.
 # "stop_distance" stops if a collision is nearer than the worst-case stopping distance and the distance is decreasing. Requires joint acceleration limits
-collision_check_type: threshold_distance
+# collision_check_type: threshold_distance
+collision_check_type: bullet_collision
+
 # Parameters for "threshold_distance"-type collision checking
 self_collision_proximity_threshold: 0.01 # Start decelerating when a self-collision is this far [m]
 scene_collision_proximity_threshold: 0.05 # Start decelerating when a scene collision is this far [m]

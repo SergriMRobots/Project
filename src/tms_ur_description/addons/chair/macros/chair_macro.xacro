@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+
+<xacro:macro name="add_chair" params="">
+    <joint name="chair_joint" type="fixed">
+      <parent link="tms_base" />
+      <child link = "back" />
+      <origin xyz="0.0 -0.3 0.85" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="back">
+      <visual>
+        <origin xyz="0 0 0" rpy="70 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/visual/parts/back.stl"/>
+        </geometry>
+      </visual>
+      <collision concave="yes">
+        <origin xyz="0 0 0" rpy="70 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/collision/parts/back.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="chair_head_joint" type="fixed">
+      <parent link="back" />
+      <child link = "chair_head" />
+      <origin xyz="0.0 -0.1 0.1" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="chair_head">
+      <visual>
+        <origin xyz="0 0 0" rpy="80 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/visual/parts/head.stl"/>
+        </geometry>
+      </visual>
+      <collision concave="yes">
+        <origin xyz="0 0 0" rpy="80 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/collision/parts/head.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="chair_l_cylinder_joint" type="fixed">
+      <parent link="back" />
+      <child link = "l_cylinder" />
+      <origin xyz="0.05 -0.06 0.06" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="l_cylinder">
+      <visual>
+        <origin xyz="0 0 0" rpy="-70 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/visual/parts/cylinder.stl"/>
+        </geometry>
+      </visual>
+      <collision concave="yes">
+        <origin xyz="0 0 0" rpy="-70 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/collision/parts/cylinder.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="chair_r_cylinder_joint" type="fixed">
+      <parent link="back" />
+      <child link = "r_cylinder" />
+      <origin xyz="-0.05 -0.06 0.06" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="r_cylinder">
+      <visual>
+        <origin xyz="0 0 0" rpy="-70 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/visual/parts/cylinder.stl"/>
+        </geometry>
+      </visual>
+      <collision concave="yes">
+        <origin xyz="0 0 0" rpy="-70 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/collision/parts/cylinder.stl"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="sphere_joint" type="fixed">
+      <parent link="chair_head" />
+      <child link = "sphere" />
+      <origin xyz="0 -0.1 -0.08" rpy="0.0 0.0 0.0" />
+    </joint>
+    <link name="sphere">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/visual/parts/sphere.stl" scale="0.8 0.8 0.8"/>
+        </geometry>
+      </visual>
+      <collision concave="yes">
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://tms_ur_description/addons/chair/meshes/collision/parts/sphere.stl" scale="0.8 0.8 0.8"/>
+        </geometry>
+      </collision>
+    </link>
+
+</xacro:macro>
+
+
+</robot>

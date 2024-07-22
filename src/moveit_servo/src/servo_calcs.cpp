@@ -215,6 +215,11 @@ ServoCalcs::ServoCalcs(ros::NodeHandle& nh, ServoParameters& parameters,
     {
       collision_checker_ = std::make_unique<ThresholdDistanceCollisionCheck>(nh_, parameters_, planning_scene_monitor_);
     }
+    else if (parameters_.collision_check_type == "bullet_collision")
+    {
+      collision_checker_ = std::make_unique<BulletCollisionCheck>(nh_, parameters_, planning_scene_monitor_);
+    }
+
     else if (!getRobotAcceleration())
     {
       ROS_WARN_NAMED(LOGNAME, "An acceleration limit is not defined for some joints. Minimum stop "
@@ -449,8 +454,8 @@ void ServoCalcs::applyVelocityScaling(Eigen::ArrayXd& delta_theta, double singul
   if (!addJointIncrements(future_state, delta_theta))
     delta_theta.setZero();
 
-  double collision_scale =
-      collision_checker_ ? collision_checker_->getScaleCoef(original_joint_state_, future_state) : 1.0;
+  double collision_scale = 0.9;
+  double dummy = collision_checker_ ? collision_checker_->getScaleCoef(original_joint_state_, future_state) : 1.0;
 
   if (collision_scale > 0 && collision_scale < 1)
   {

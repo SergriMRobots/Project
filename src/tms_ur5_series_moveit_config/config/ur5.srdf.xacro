@@ -10,12 +10,12 @@
     <!--CHAINS: When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
     <!--SUBGROUPS: Groups can also be formed by referencing to already defined group names-->
     <group name="manipulator">
-        <chain base_link="base_link" tip_link="ee_link" />
+        <chain base_link="base_link" tip_link="ee_link" /> <!--FIXME tool0-->
     </group>
     <group name="ee_group">
-         <link name="ee_link" />
+         <link name="ee_link" /> <!--FIXME tool0-->
     </group>
-    <end_effector name="ur5_end_effector" parent_link="ee_link" group="ee_group" parent_group="manipulator" />
+    <end_effector name="ur5_end_effector" parent_link="ee_link" group="ee_group" parent_group="manipulator" /> <!--FIXME tool0-->
 
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
     <xacro:include filename="$(find tms_ur5_series_moveit_config)/xacro_macros/state_macro.xacro" />
@@ -65,4 +65,46 @@
     <disable_collisions link1="ndi_marker_link" link2="wrist_2_link" reason="Never"/>
     <disable_collisions link1="ndi_marker_link" link2="wrist_3_link" reason="Never"/>
 
+    <!-- chair -->
+    <disable_collisions link1="r_cylinder" link2="chair_head" reason="Never"/>
+    <disable_collisions link1="r_cylinder" link2="back" reason="Never"/>
+
+
+    <disable_collisions link1="l_cylinder" link2="chair_head" reason="Never"/>
+    <disable_collisions link1="l_cylinder" link2="back" reason="Never"/>
+
+    <disable_collisions link1="l_cylinder" link2="r_cylinder" reason="Never"/>
+    <disable_collisions link1="chair_head" link2="back" reason="Never"/>
+
+    <disable_collisions link1="l_cylinder" link2="base_link_inertia" reason="Never"/>
+    <disable_collisions link1="r_cylinder" link2="base_link_inertia" reason="Never"/>
+    <disable_collisions link1="back"       link2="base_link_inertia" reason="Never"/>
+    <disable_collisions link1="chair_head" link2="base_link_inertia" reason="Never"/>
+
+    <disable_collisions link1="l_cylinder" link2="sphere" reason="Never"/>
+    <disable_collisions link1="r_cylinder" link2="sphere" reason="Never"/>
+    <disable_collisions link1="back"       link2="sphere" reason="Never"/>
+    <disable_collisions link1="chair_head" link2="sphere" reason="Never"/>
+
+    <disable_collisions link1="l_cylinder" link2="shoulder_link" reason="Never"/>
+    <disable_collisions link1="r_cylinder" link2="shoulder_link" reason="Never"/>
+    <disable_collisions link1="back"       link2="shoulder_link" reason="Never"/>
+    <disable_collisions link1="chair_head" link2="shoulder_link" reason="Never"/>
+    <disable_collisions link1="sphere"     link2="shoulder_link" reason="Adjacent"/>
+
+<!-- Not sure -->
+    <disable_collisions link1="l_cylinder" link2="sensor_body" reason="Never"/>
+    <disable_collisions link1="r_cylinder" link2="sensor_body" reason="Never"/>
+    <disable_collisions link1="back"       link2="sensor_body" reason="Never"/>
+    <disable_collisions link1="chair_head" link2="sensor_body" reason="Never"/>
+    <disable_collisions link1="sphere"     link2="sensor_body" reason="Adjacent"/>
+
+    
+    <disable_collisions link1="l_cylinder" link2="wrist_3_link" reason="Adjacent"/>
+    <disable_collisions link1="r_cylinder" link2="wrist_3_link" reason="Adjacent"/>
+    <disable_collisions link1="back"       link2="wrist_3_link" reason="Adjacent"/>
+    <disable_collisions link1="chair_head" link2="wrist_3_link" reason="Adjacent"/>
+    <disable_collisions link1="sphere"     link2="wrist_3_link" reason="Adjacent"/>
+
+<!--  -->
 </robot>
