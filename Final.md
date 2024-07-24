@@ -57,6 +57,7 @@ if (parameters_.check_collisions)
 
    1. Bullet производит быстрое вычисление расстояний. Тесты показали, что в сравнении с *threshold_distance*, изначально взятой из FCL, Bullet в среднем был в 30 раз быстрее, что позволяет нам уложиться в 125 Hz для применения его в режиме реального времени.
    2. Собственно, Америку я не открывал и просто использовал [туториал](https://moveit.ros.org/bullet/collision%20detection/moveit/2020/11/18/bullet-collision.html) и [github](https://github.com/moveit/moveit/issues/2998). Конфигурацию файлов и настроек я сделал ровно такую же, как и у *threshold_distance*: то есть буквально делал поиск по файлам строчки "thresholddistance" и тд... и рядом добавлял настройки для своего класса Bullet.
+
       2.2 Для спинки кресла надо было сформировать файлы в папке *tms_ur_description* папку *chair*  и добавить
 
       ```
