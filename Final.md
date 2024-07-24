@@ -56,7 +56,7 @@ if (parameters_.check_collisions)
 3. Какие подводные
 
    1. Bullet производит быстрое вычисление расстояний. Тесты показали, что в сравнении с *threshold_distance*, изначально взятой из FCL, Bullet в среднем был в 30 раз быстрее, что позволяет нам уложиться в 125 Hz для применения его в режиме реального времени.
-   2. Собственно, Америку я не открывал и просто использовал [туториал](https://moveit.ros.org/bullet/collision%20detection/moveit/2020/11/18/bullet-collision.html) и [github](https://github.com/moveit/moveit/issues/2998). Конфигурацию файлов и настроек я сделал ровно такую же, как и у *threshold_distance*: то есть буквально делал поиск по файлам строчки "thresholddistance" и тд... и рядом добавлял настройки для своего класса Bullet.
+   2. Собственно, Америку я не открывал и просто использовал [туториал](https://moveit.ros.org/bullet/collision%20detection/moveit/2020/11/18/bullet-collision.html) и [github](https://github.com/moveit/moveit/issues/2998). Конфигурацию файлов и настроек я сделал ровно такую же, как и у *threshold_distance*: то есть буквально делал поиск по файлам строчки "thresholddistance" и тд... и рядом добавлял настройки для своего класса Bullet, реализованного в */src/moveit_servo/src/bullet_collision.cpp*
 
       2.2 Для спинки кресла надо было сформировать файлы в папке *tms_ur_description* папку *chair*  и добавить
 
@@ -68,7 +68,7 @@ if (parameters_.check_collisions)
       в файл */home/mrobots/next2/tms_ws_lite/src/tms_ur_description/urdf/ur.xacro*
 
       
-   4. Подводные оказались в том, что bullet плохо работает с невыпуклыми формами, поэтому сложные фигуры лучше или аппроксимировать более простыми или (как в случае со спинкой кресла) разбивать на меньшие части и собирать отдельно в urdf файле (смотри */home/mrobots/next2/tms_ws_lite/src/tms_ur_description/addons/chair/macros/chair_macro.xacro*). То есть **невыпуклых форм в виде готовых stl файлов надо избегать**. Это оказалась известная проблема, но чтобы ее найти, потребовалось много времени [link](https://github.com/bulletphysics/bullet3/issues/1507) [link2](https://github.com/bulletphysics/bullet3/issues/2531)  
+   4. Подводные оказались в том, что bullet плохо работает с невыпуклыми формами, поэтому сложные фигуры лучше или аппроксимировать более простыми или (как в случае со спинкой кресла) разбивать на меньшие части и собирать отдельно в urdf файле (смотри */src/tms_ur_description/addons/chair/macros/chair_macro.xacro*). То есть **невыпуклых форм в виде готовых stl файлов надо избегать**. Это оказалась известная проблема, но чтобы ее найти, потребовалось много времени [link](https://github.com/bulletphysics/bullet3/issues/1507) [link2](https://github.com/bulletphysics/bullet3/issues/2531)  
 
 
 
