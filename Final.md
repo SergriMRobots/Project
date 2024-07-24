@@ -68,7 +68,7 @@ if (parameters_.check_collisions)
       в файл */home/mrobots/next2/tms_ws_lite/src/tms_ur_description/urdf/ur.xacro*
 
       
-   4. Подводные оказались в том, что bullet плохо работает с невыпуклыми формами, поэтому сложные фигуры лучше или аппроксимировать более простыми или (как в случае со спинкой кресла) разбивать на меньшие части и собирать отдельно в urdf файле (смотри */home/mrobots/next2/tms_ws_lite/src/tms_ur_description/addons/chair/macros/chair_macro.xacro*). То есть невыпуклых форм в виде готовых stl файлов надо избегать. Это оказалась известная проблема, но чтобы ее найти, потребовалось много времени [link](https://github.com/bulletphysics/bullet3/issues/1507) [link2](https://github.com/bulletphysics/bullet3/issues/2531)  
+   4. Подводные оказались в том, что bullet плохо работает с невыпуклыми формами, поэтому сложные фигуры лучше или аппроксимировать более простыми или (как в случае со спинкой кресла) разбивать на меньшие части и собирать отдельно в urdf файле (смотри */home/mrobots/next2/tms_ws_lite/src/tms_ur_description/addons/chair/macros/chair_macro.xacro*). То есть **невыпуклых форм в виде готовых stl файлов надо избегать**. Это оказалась известная проблема, но чтобы ее найти, потребовалось много времени [link](https://github.com/bulletphysics/bullet3/issues/1507) [link2](https://github.com/bulletphysics/bullet3/issues/2531)  
 
 
 
