@@ -235,12 +235,12 @@ double CollisionCheck::getScaleCoef(const sensor_msgs::JointState& now, const se
   {
     static ros::Duration max_elapsed;
     auto start = ros::Time::now();
-    auto scale = 1.0; //calcIteration(now, future); //FIXME
+    auto scale = calcIteration(now, future); //FIXME
 
-    auto dummy = calcIteration(now, future); //FIXME
+    // auto dummy = calcIteration(now, future); //FIXME
     //distance 
     std_msgs::Float64 collision_test_distance;//FIXME
-    collision_test_distance.data = dummy;//FIXME
+    collision_test_distance.data = scale;//FIXME
     dummy_distance_publisher_.publish(collision_test_distance); //FIXME
 
 

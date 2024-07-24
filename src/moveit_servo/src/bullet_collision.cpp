@@ -22,8 +22,8 @@ constexpr double EPSILON = 1e-6;  // For very small numeric comparisons
 
 double BulletCollisionCheck::computeScale(double current_dist)
 {
-  double warn=0;//FIXME
-  double stop=3;//FIXME 
+  double warn=0.01;//FIXME
+  double stop=0.002;//FIXME 
   if (current_dist > warn)
     return 1.0;
   else if (current_dist <= warn && current_dist > stop)
@@ -76,8 +76,8 @@ double BulletCollisionCheck::calcIteration(const sensor_msgs::JointState& now,
 
   auto current_time = ros::Time::now();
   double scale = computeScale(current_dist);
-  // return scale;
-  return current_dist; //FIXME
+  return scale;
+  // return current_dist; //FIXME
 
 }
 }  // namespace moveit_servo

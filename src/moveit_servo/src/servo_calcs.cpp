@@ -454,18 +454,17 @@ void ServoCalcs::applyVelocityScaling(Eigen::ArrayXd& delta_theta, double singul
   if (!addJointIncrements(future_state, delta_theta))
     delta_theta.setZero();
 
-  double collision_scale = 0.9;
-  double dummy = collision_checker_ ? collision_checker_->getScaleCoef(original_joint_state_, future_state) : 1.0;
+  double collision_scale = collision_checker_ ? collision_checker_->getScaleCoef(original_joint_state_, future_state) : 1.0; //FIXME
 
   if (collision_scale > 0 && collision_scale < 1)
   {
     status_ = StatusCode::DECELERATE_FOR_COLLISION;
     ROS_WARN_STREAM_THROTTLE_NAMED(ROS_LOG_THROTTLE_PERIOD, LOGNAME, SERVO_STATUS_CODE_MAP.at(status_));
   }
-  //  else if (collision_scale == 0)
-  //  {
-  //    status_ = StatusCode::HALT_FOR_COLLISION;
-  //  }
+  //  else if (collision_scale == 0) //FIXME
+  //  {//FIXME
+  //    status_ = StatusCode::HALT_FOR_COLLISION; //FIXME
+  //  }//FIXME
 
   delta_theta = collision_scale * singularity_scale * delta_theta;
 
