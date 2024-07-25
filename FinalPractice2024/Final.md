@@ -67,6 +67,8 @@ if (parameters_.check_collisions)
       ```
       в файл */src/tms_ur_description/urdf/ur.xacro*
 
+      2.3 Еще надо не забыть отключить нежелательные коллизии в файле */src/tms_ur5_series_moveit_config/config/ur5.srdf.xacro* чтоб у нас не считались расстояния между частями кресла или какие-то еще, которые мы не хотим
+
    3. Подводные оказались в том, что bullet плохо работает с невыпуклыми формами, поэтому сложные фигуры лучше или аппроксимировать более простыми или (как в случае со спинкой кресла) разбивать на меньшие части и собирать отдельно в urdf файле (смотри */src/tms_ur_description/addons/chair/macros/chair_macro.xacro*). То есть **невыпуклых форм в виде готовых stl файлов (как например старая версия base.stl) надо избегать**. Это оказалась известная проблема, но чтобы ее найти, потребовалось много времени [link](https://github.com/bulletphysics/bullet3/issues/1507) [link2](https://github.com/bulletphysics/bullet3/issues/2531)  
 
 **Джойстик** 
